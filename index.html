@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажер подготовки к ЕГЭ</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #1e293b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            max-width: 500px;
+            width: 100%;
+            padding: 25px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-size: 22px;
+            color: #0f172a;
+            margin-top: 0;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .subjects {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-subj {
+            background-color: #2563eb;
+            color: white;
+        }
+        .btn-subj:hover {
+            background-color: #1d4ed8;
+        }
+        .task-box {
+            background: #f8fafc;
+            border-left: 4px solid #2563eb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            min-height: 80px;
+        }
+        .topic {
+            font-size: 12px;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 2;
+            padding: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+        input:focus {
+            border-color: #2563eb;
+        }
+        .btn-check {
+            flex: 1;
+            background-color: #16a34a;
+            color: white;
+        }
+        .btn-check:hover {
+            background-color: #15803d;
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🎓  Трекер подготовки к ЕГЭ</h1>
+    
+    <div class="stats">
+        <span>Решено: <span id="solved">0</span></span>
+        <span>Верно: <span id="correct">0</span></span>
+        <span>Точность: <span id="percent">0%</span></span>
+    </div>
+
+    <div class="subjects">
+        <button class="btn-subj" onclick="nextTask('Информатика')">💻  Информатика</button>
+        <button class="btn-subj" onclick="nextTask('Математика')">📐  Математика</button>
+    </div>
+
+    <div class="task-box">
+        <div class="topic" id="topic">Выберите предмет выше</div>
+        <div id="question">Нажмите на кнопку «Информатика» или «Математика», чтобы получить случайное задание из базы ЕГЭ.</div>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="answerInput" placeholder="Ваш ответ...">
+        <button class="btn-check" onclick="checkAnswer()">Проверить</button>
+    </div>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    const tasks = [
+        // ИНФОРМАТИКА (10 задач)
+        { subject: "Информатика", topic: "Системы счисления", q: "Сколько единиц в двоичной записи числа 129?", a: "2" },
+        { subject: "Информатика", topic: "Системы счисления", q: "Переведите двоичное число 101101 в десятичную систему счисления.", a: "45" },
+        { subject: "Информатика", topic: "Кодирование изображений", q: "Какой минимальный объем памяти (в Кбайт) нужен для хранения растрового изображения 128×128 пикселей с палитрой из 64 цветов?", a: "12" },
+        { subject: "Информатика", topic: "Кодирование звука", q: "Производится двухканальная (стерео) звукозапись с частотой дискретизации 16 кГц и 16-битным разрешением. Запись длится 1 минуту. Определите размер файла в Кбайт (округлите до целого).", a: "3750" },
+        { subject: "Информатика", topic: "Алгебра логики", q: "Для какого наименьшего целого числа А формула ((x ≤ 9) → (x*x ≤ A)) ∧ ((y*y ≤ A) → (y ≤ 9)) тождественно истинна?", a: "81" },
+        { subject: "Информатика", topic: "Алгебра логики", q: "Сколько различных решений имеет уравнение (K ∧ L ∧ M) ∨ (¬L ∧ ¬M ∧ N) = 1, где K, L, M, N — логические переменные?", a: "4" },
+        { subject: "Информатика", topic: "Комбинаторика", q: "Сколько существует различных трехзначных чисел, записанных в пятеричной системе счисления, в записи которых цифры следуют слева направо в строго убывающем порядке?", a: "10" },
+        { subject: "Информатика", topic: "Передача информации", q: "Скорость передачи данных через ADSL-соединение равна 256000 бит/с. Передача файла заняла 16 секунд. Определите размер файла в Кбайт.", a: "500" },
+        { subject: "Информатика", topic: "Рекурсивные алгоритмы", q: "Алгоритм вычисления функции F(n) задан соотношениями: F(1) = 1; F(n) = F(n–1) * n при n > 1. Чему равно значение функции F(5)?", a: "120" },
+        { subject: "Информатика", topic: "IP-адресация", q: "В терминологии сетей TCP/IP маской сети называют двоичное число, определяющее, какая часть IP-адреса узла сети относится к адресу сети, а какая — к адресу самого узла. Сколько единиц в двоичной записи маски 255.255.240.0?", a: "20" },
+
+        // МАТЕМАТИКА (10 задач)
+        { subject: "Математика", topic: "Теория вероятностей", q: "В среднем из 100 карманных фонариков 4 неисправных. Найдите вероятность того, что выбранный наудачу фонарик исправен.", a: "0.96" },
+        { subject: "Математика", topic: "Теория вероятностей", q: "В сборнике билетов по биологии всего 25 билетов, в двух из них встречается вопрос о грибах. Найдите вероятность того, что в случайно выбранном на экзамене билете школьнику достанется вопрос о грибах.", a: "0.08" },
+        { subject: "Математика", topic: "Уравнения", q: "Найдите корень уравнения: log₂(4 + x) = 5", a: "28" },
+        { subject: "Математика", topic: "Уравнения", q: "Найдите корень уравнения: 3^(x - 5) = 81", a: "9" },
+        { subject: "Математика", topic: "Проценты и сплавы", q: "Футболка стоила 800 рублей. После снижения цены она стала стоить 680 рублей. На сколько процентов была снижена цена?", a: "15" },
+        { subject: "Математика", topic: "Планиметрия", q: "В треугольнике ABC угол C равен 90°, AB = 10, AC = 8. Найдите sin A.", a: "0.6" },
+        { subject: "Математика", topic: "Стереометрия", q: "Во сколько раз увеличится объем куба, если его ребра увеличить в 3 раза?", a: "27" },
+        { subject: "Математика", topic: "Производная", q: "Найдите точку минимума функции y = x² - 6x + 10.", a: "3" },
+        { subject: "Математика", topic: "Вычисления и преобразования", q: "Найдите значение выражения: (√13 - √7)(√13 + √7)", a: "6" },
+        { subject: "Математика", topic: "Текстовые задачи", q: "Моторная лодка прошла против течения реки 112 км и вернулась в пункт отправления, затратив на обратный путь на 6 часов меньше. Найдите скорость течения, если скорость лодки в неподвижной воде равна 11 км/ч.", a: "3" }
+    ];
+
+    let currentTask = null;
+    let stats = JSON.parse(localStorage.getItem('ege_stats')) || { solved: 0, correct: 0 };
+
+    function updateStatsUI() {
+        document.getElementById('solved').innerText = stats.solved;
+        document.getElementById('correct').innerText = stats.correct;
+        const pct = stats.solved > 0 ? Math.round((stats.correct / stats.solved) * 100) : 0;
+        document.getElementById('percent').innerText = pct + '%';
+        localStorage.setItem('ege_stats', JSON.stringify(stats));
+    }
+
+    function nextTask(subject) {
+        const filtered = tasks.filter(t => t.subject === subject);
+        currentTask = filtered[Math.floor(Math.random() * filtered.length)];
+        document.getElementById('topic').innerText = `${currentTask.subject} | ${currentTask.topic}`;
+        document.getElementById('question').innerText = currentTask.q;
+        document.getElementById('answerInput').value = '';
+        document.getElementById('result').innerText = '';
+    }
+
+    function checkAnswer() {
+        if (!currentTask) return;
+        const userAns = document.getElementById('answerInput').value.trim().replace(',', '.').toLowerCase();
+        if (!userAns) return;
+
+        stats.solved++;
+        const resEl = document.getElementById('result');
+        if (userAns === currentTask.a.toLowerCase()) {
+            stats.correct++;
+            resEl.style.color = '#16a34a';
+            resEl.innerText = '✅  Верно! Отличная работа.';
+        } else {
+            resEl.style.color = '#dc2626';
+            resEl.innerText = `❌  Неверно. Правильный ответ: ${currentTask.a}`;
+        }
+        updateStatsUI();
+        currentTask = null;
+    }
+
+    updateStatsUI();
+</script>
+
+</body>
+</html>
